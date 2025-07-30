@@ -1,0 +1,47 @@
+parsers:
+  products:
+    root_element: "products"
+    item_element: "product"
+    fields:
+      id: "@id"
+      name: "name"
+      category: "category"
+      brand: "brand"
+      price:
+        type: "attribute"
+        path: "price"
+        attribute: "currency"
+        transform:
+          format: "%.2f"
+      description: "description"
+  
+  plants:
+    root_element: "flora"
+    item_element: "plant"
+    fields:
+      id: "@id"
+      common_name: "common_name"
+      scientific_name: "scientific_name"
+      taxonomy:
+        type: "object"
+        fields:
+          family: "taxonomy/family"
+          genus: "taxonomy/genus"
+          species: "taxonomy/species"
+      plant_type: "characteristics/type"
+      height:
+        type: "attribute"
+        path: "characteristics/height"
+        attribute: "unit"
+      sun_exposure:
+        type: "array"
+        path: "characteristics/sun_exposure/exposure"
+      foliage: "characteristics/foliage"
+      care:
+        type: "object"
+        fields:
+          watering: "maintenance/watering"
+          soil: "maintenance/soil_type"
+      regions:
+        type: "array"
+        path: "regional_info/region"

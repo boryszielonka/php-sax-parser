@@ -1,0 +1,10 @@
+/var/
+/vendor/
+/.idea/
+.idea
+.idea/
+.nbproject
+.nbproject/
+.vscode/
+.DS_Store
+/.php-cs-fixer.cache

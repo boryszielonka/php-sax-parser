@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+    <product id="501">
+        <name>Ektorp Sofa</name>
+        <category>Living Room Furniture</category>
+        <brand>IKEA</brand>
+        <price currency="USD">599.00</price>
+        <description>A classic, comfortable 3-seat sofa with removable, washable covers.</description>
+    </product>
+    <product id="502">
+        <name>Noguchi Table</name>
+        <category>Living Room Furniture</category>
+        <brand>Herman Miller</brand>
+        <price currency="USD">2195.00</price>
+        <description>Iconic mid-century modern coffee table with a sculptural wooden base and glass top.</description>
+    </product>
+    <product id="503">
+        <name>Eames Lounge Chair and Ottoman</name>
+        <category>Living Room Furniture</category>
+        <brand>Herman Miller</brand>
+        <price currency="USD">7495.00</price>
+        <description>The quintessential mid-century modern lounge chair, offering luxurious comfort and timeless style.</description>
+    </product>
+    <product id="601">
+        <name>The Bed</name>
+        <category>Bedroom Furniture</category>
+        <brand>Thuma</brand>
+        <price currency="USD">1195.00</price>
+        <description>A minimalist, high-quality platform bed frame made from solid wood with easy assembly.</description>
+    </product>
+    <product id="602">
+        <name>MALM 6-drawer dresser</name>
+        <category>Bedroom Furniture</category>
+        <brand>IKEA</brand>
+        <price currency="USD">279.00</price>
+        <description>A modern dresser with a clean design and smooth-running drawers.</description>
+    </product>
+    <product id="701">
+        <name>Saarinen Tulip Table</name>
+        <category>Dining Room Furniture</category>
+        <brand>Knoll</brand>
+        <price currency="USD">2987.00</price>
+        <description>A pedestal table design that eliminated the "slum of legs," available in various finishes.</description>
+    </product>
+    <product id="702">
+        <name>Eames Molded Plastic Side Chair</name>
+        <category>Dining Room Furniture</category>
+        <brand>Herman Miller</brand>
+        <price currency="USD">595.00</price>
+        <description>A classic, versatile chair with an organically shaped shell and various base options.</description>
+    </product>
+    <product id="801">
+        <name>Jarvis Bamboo Standing Desk</name>
+        <category>Office Furniture</category>
+        <brand>Fully</brand>
+        <price currency="USD">799.00</price>
+        <description>An adjustable-height standing desk with a sustainable bamboo top and a powerful motor.</description>
+    </product>
+    <product id="802">
+        <name>Aeron Chair</name>
+        <category>Office Furniture</category>
+        <brand>Herman Miller</brand>
+        <price currency="USD">1805.00</price>
+        <description>An iconic ergonomic office chair known for its comfort, support, and innovative design.</description>
+    </product>
+    <product id="901">
+        <name>BILLY Bookcase</name>
+        <category>Storage Furniture</category>
+        <brand>IKEA</brand>
+        <price currency="USD">89.00</price>
+        <description>A versatile and popular bookcase, adaptable to many spaces and needs.</description>
+    </product>
+</products>

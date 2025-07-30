@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flora>
+    <plant id="T-001">
+        <common_name>Oak Tree</common_name>
+        <scientific_name>Quercus robur</scientific_name>
+        <taxonomy>
+            <family>Fagaceae</family>
+            <genus>Quercus</genus>
+            <species>robur</species>
+        </taxonomy>
+        <characteristics>
+            <type>Deciduous Tree</type>
+            <height unit="meters">40</height>
+            <sun_exposure>
+                <exposure>Full Sun</exposure>
+            </sun_exposure>
+            <foliage>Lobed leaves that turn brown in autumn</foliage>
+        </characteristics>
+        <maintenance>
+            <watering>Prefers moderate watering, drought-tolerant once established.</watering>
+            <soil_type>Adaptable to a wide range of soil types, but prefers well-drained loamy soil.</soil_type>
+        </maintenance>
+        <regional_info>
+            <region>Europe</region>
+            <region>North Africa</region>
+            <region>Western Asia</region>
+        </regional_info>
+    </plant>
+
+    <plant id="S-002">
+        <common_name>Japanese Maple</common_name>
+        <scientific_name>Acer palmatum</scientific_name>
+        <taxonomy>
+            <family>Sapindaceae</family>
+            <genus>Acer</genus>
+            <species>palmatum</species>
+        </taxonomy>
+        <characteristics>
+            <type>Small Deciduous Tree</type>
+            <height unit="meters">8</height>
+            <sun_exposure>
+                <exposure>Partial Shade</exposure>
+                <exposure>Filtered Sun</exposure>
+            </sun_exposure>
+            <foliage>Distinctive red or green palmate leaves, vibrant autumn color.</foliage>
+        </characteristics>
+        <maintenance>
+            <watering>Requires consistent moisture, do not let the soil dry out completely.</watering>
+            <soil_type>Prefers moist, slightly acidic, well-drained soil.</soil_type>
+        </maintenance>
+        <regional_info>
+            <region>Japan</region>
+            <region>China</region>
+            <region>Korea</region>
+        </regional_info>
+    </plant>
+
+    <plant id="F-003">
+        <common_name>English Lavender</common_name>
+        <scientific_name>Lavandula angustifolia</scientific_name>
+        <taxonomy>
+            <family>Lamiaceae</family>
+            <genus>Lavandula</genus>
+            <species>angustifolia</species>
+        </taxonomy>
+        <characteristics>
+            <type>Flowering Shrub</type>
+            <height unit="centimeters">60</height>
+            <sun_exposure>
+                <exposure>Full Sun</exposure>
+            </sun_exposure>
+            <foliage>Aromatic silvery-green leaves with purple flower spikes.</foliage>
+        </characteristics>
+        <maintenance>
+            <watering>Drought-tolerant; water sparingly once established.</watering>
+            <soil_type>Requires well-drained, slightly alkaline soil. Avoid wet conditions.</soil_type>
+        </maintenance>
+        <regional_info>
+            <region>Mediterranean</region>
+        </regional_info>
+    </plant>
+
+    <plant id="H-004">
+        <common_name>Peace Lily</common_name>
+        <scientific_name>Spathiphyllum wallisii</scientific_name>
+        <taxonomy>
+            <family>Araceae</family>
+            <genus>Spathiphyllum</genus>
+            <species>wallisii</species>
+        </taxonomy>
+        <characteristics>
+            <type>Evergreen Herbaceous Perennial</type>
+            <height unit="centimeters">50</height>
+            <sun_exposure>
+                <exposure>Partial Shade</exposure>
+                <exposure>Low Light</exposure>
+            </sun_exposure>
+            <foliage>Glossy, dark green leaves and white spathe flowers.</foliage>
+        </characteristics>
+        <maintenance>
+            <watering>Keep soil consistently moist but not waterlogged. Sensitive to overwatering.</watering>
+            <soil_type>Prefers well-draining, peat-based potting mix.</soil_type>
+        </maintenance>
+        <regional_info>
+            <region>Central America</region>
+            <region>South America</region>
+        </regional_info>
+    </plant>
+
+    <plant id="C-005">
+        <common_name>Snake Plant</common_name>
+        <scientific_name>Dracaena trifasciata</scientific_name>
+        <taxonomy>
+            <family>Asparagaceae</family>
+            <genus>Dracaena</genus>
+            <species>trifasciata</species>
+        </taxonomy>
+        <characteristics>
+            <type>Succulent</type>
+            <height unit="centimeters">90</height>
+            <sun_exposure>
+                <exposure>Low Light</exposure>
+                <exposure>Indirect Sunlight</exposure>
+            </sun_exposure>
+            <foliage>Stiff, upright leaves with yellow or silver-striped patterns.</foliage>
+        </characteristics>
+        <maintenance>
+            <watering>Very drought-tolerant. Allow soil to dry out completely between waterings.</watering>
+            <soil_type>Requires free-draining cactus or succulent mix.</soil_type>
+        </maintenance>
+        <regional_info>
+            <region>West Africa</region>
+        </regional_info>
+    </plant>
+</flora>
