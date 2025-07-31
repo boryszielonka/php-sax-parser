@@ -40,7 +40,7 @@ jobs:
 
       - name: Run PHPUnit tests with coverage
         run: ./vendor/bin/phpunit tests \
-          --coverage-clover=coverage.xml \
+          --coverage-clover=clover.xml \
           --coverage-filter=src \
           --bootstrap=vendor/autoload.php
 

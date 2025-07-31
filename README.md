@@ -1,4 +1,6 @@
 # PHP SAX Parser
+[![CI](https://github.com/boryszielonka/php-sax-parser/actions/workflows/ci.yml/badge.svg)](https://github.com/boryszielonka/php-sax-parser/actions)
+[![Coverage](https://raw.githubusercontent.com/boryszielonka/php-sax-parser/main/output/coverage.svg)](https://github.com/boryszielonka/php-sax-parser)
 
 Simple and efficient XML streaming parser for PHP using SAX (Simple API for XML) approach. 
 This library allows you to parse large XML files without loading entire document into memory.
