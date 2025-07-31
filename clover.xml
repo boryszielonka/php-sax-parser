@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1753955441">
-  <project timestamp="1753955441" name="Clover Coverage">
+<coverage generated="1753955770">
+  <project timestamp="1753955770" name="Clover Coverage">
     <package name="BoZielonka\PhpSaxParser">
       <file name="/home/runner/work/php-sax-parser/php-sax-parser/src/Config.php">
         <class name="BoZielonka\PhpSaxParser\Config" namespace="BoZielonka\PhpSaxParser">
