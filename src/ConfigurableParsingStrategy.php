@@ -33,9 +33,9 @@ final class ConfigurableParsingStrategy implements ParsingStrategyInterface
     }
 
     public function processElement(
-        string               $path,
-        string               $value,
-        array                $attributes,
+        string $path,
+        string $value,
+        array $attributes,
         ParsingContextStacks $context
     ): void {
         if ($this->shouldStartCollecting($path, $attributes)) {
@@ -135,7 +135,6 @@ final class ConfigurableParsingStrategy implements ParsingStrategyInterface
             $this->fieldConfigs,
             static fn ($fieldConfig) => $fieldConfig->matchesPath($path)
         );
-
     }
 
     private function processFieldValue(FieldConfig $fieldConfig, string $path, string $value): void

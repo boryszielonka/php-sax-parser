@@ -12,7 +12,6 @@ final class ParsingContextStacks
     private SplStack $elementStack;
     private SplStack $dataStack;
     private string $currentPath = '';
-    private bool $isCollecting = false;
     private array $currentData = [];
 
     public function __construct()
@@ -62,13 +61,11 @@ final class ParsingContextStacks
 
     public function startCollecting(): void
     {
-        $this->isCollecting = true;
         $this->currentData = [];
     }
 
     public function stopCollecting(): array
     {
-        $this->isCollecting = false;
         $data = $this->currentData;
         $this->currentData = [];
 

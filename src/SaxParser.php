@@ -20,7 +20,7 @@ final readonly class SaxParser implements SaxParserInterface
             throw new InvalidArgumentException("Parser config '{$parserName}' not found");
         }
 
-//        return $this->parseWithConfig($filePath, $this->parsersConfig['parsers'][$parserName]);
+        //        return $this->parseWithConfig($filePath, $this->parsersConfig['parsers'][$parserName]);
         return $this->parseWithConfig($filePath, $this->config->parsersConfig['parsers'][$parserName]);
     }
 
@@ -43,22 +43,24 @@ final readonly class SaxParser implements SaxParserInterface
             $this->parseFile($xmlParser, $filePath);
 
             return $strategy->getCollectedData();
-
         } finally {
             xml_parser_free($xmlParser);
         }
     }
 
     private function setupXmlHandlers(
-        \XMLParser                  $xmlParser,
-        ParsingContextStacks        $context,
+        \XMLParser $xmlParser,
+        ParsingContextStacks $context,
         ConfigurableParsingStrategy $strategy
     ): void {
         $startHandler = static function (
             \XMLParser $parser,
-            string     $name,
-            array      $attributes
-        ) use ($context, $strategy): void {
+            string $name,
+            array $attributes
+        ) use (
+            $context,
+            $strategy
+        ): void {
             $context->pushElement(strtolower($name), $attributes);
             $currentPath = $context->getCurrentPath();
 
@@ -82,8 +84,11 @@ final readonly class SaxParser implements SaxParserInterface
 
         $characterDataHandler = static function (
             \XMLParser $parser,
-            string     $data
-        ) use ($context, $strategy): void {
+            string $data
+        ) use (
+            $context,
+            $strategy
+        ): void {
             $strategy->processCharacterData($data, $context);
         };
 

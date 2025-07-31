@@ -7,11 +7,11 @@ namespace BoZielonka\PhpSaxParser;
 final readonly class FieldConfig
 {
     public function __construct(
-        public string       $name,
+        public string $name,
         public string|array $definition,
-        public FieldType    $type = FieldType::STRING,
-        public ?string      $path = null,
-        public ?string      $attribute = null,
+        public FieldType $type = FieldType::STRING,
+        public ?string $path = null,
+        public ?string $attribute = null,
     ) {
     }
 

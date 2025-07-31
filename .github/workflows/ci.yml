@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: xml, libxml
+          coverage: xdebug
+
+      - name: Cache Composer packages
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run PHPCS
+        run: ./vendor/bin/phpcs --standard=PSR12 src/
+
+      - name: Run PHPStan
+        run: ./vendor/bin/phpstan analyse src/ --level=5
+
+      - name: Run PHPUnit tests with coverage
+        run: ./vendor/bin/phpunit tests \
+          --coverage-clover=coverage.xml \
+          --coverage-filter=src \
+          --bootstrap=vendor/autoload.php
+
+      - name: Generate coverage badge
+        uses: timkrase/phpunit-coverage-badge@v1.2.0
+        with:
+          coverage_badge_path: output/coverage.svg
+          push_badge: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
