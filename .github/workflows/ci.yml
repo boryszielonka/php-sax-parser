@@ -48,40 +48,9 @@ jobs:
             --coverage-filter=src \
             --bootstrap=vendor/autoload.php
 
-      - name: Generate and push coverage badge
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          cat > /tmp/badge.php << 'PHP'
-          <?php
-          $xml = simplexml_load_file('clover.xml');
-          $m = $xml->project->metrics;
-          $total = (int) $m['statements'];
-          $covered = (int) $m['coveredstatements'];
-          $pct = $total > 0 ? round($covered / $total * 100) : 0;
-          $value = $pct . ' %';
-          $color = $pct >= 90 ? '#4c1' : ($pct >= 75 ? '#dfb317' : '#e05d44');
-          $svg = <<<SVG
-          <svg width="100" height="20" xmlns="http://www.w3.org/2000/svg">
-              <g>
-                  <rect fill="none" id="canvas_background" height="22" width="102" y="-1" x="-1"/>
-              </g>
-              <g>
-                  <rect rx="2" height="18" width="98" y="1" x="1" stroke-width="1.5" stroke="#4c4c4c" fill="#4c4c4c"/>
-                  <text transform="matrix(0.95, 0, 0, 1.01133, 0.0809801, -0.0237383)" font-weight="normal" xml:space="preserve" text-anchor="start" font-family="'Trebuchet MS', Gadget, sans-serif" font-size="12" y="14.45" x="2.8" stroke-width="0" stroke="#4c4c4c" fill="#6e747d">coverage</text>
-                  <text transform="matrix(0.95, 0, 0, 1.01133, 0.0809801, -0.0237383)" font-weight="normal" xml:space="preserve" text-anchor="start" font-family="'Trebuchet MS', Gadget, sans-serif" font-size="12" y="13.9" x="2.2" stroke-width="0" stroke="#4c4c4c" fill="#ffffff">coverage</text>
-                  <rect rx="2" height="18" width="40.90531" y="1.01077" x="58.13716" stroke-width="1.5" stroke="{$color}" fill="{$color}"/>
-                  <rect height="18" width="10" y="1.01077" x="58.00804" stroke-width="1.5" stroke="{$color}" fill="{$color}"/>
-                  <text transform="matrix(0.95, 0, 0, 1.01133, 0.0809801, -0.0237383)" font-weight="normal" xml:space="preserve" text-anchor="end" font-family="'Trebuchet MS', Gadget, sans-serif" font-size="10" y="14.35" x="99" stroke-width="0" stroke="#4c4c4c" fill="#6e747d">{$value}</text>
-                  <text transform="matrix(0.95, 0, 0, 1.01133, 0.0809801, -0.0237383)" font-weight="normal" xml:space="preserve" text-anchor="end" font-family="'Trebuchet MS', Gadget, sans-serif" font-size="10" y="13.8" x="98.4" stroke-width="0" stroke="#4c4c4c" fill="#ffffff">{$value}</text>
-              </g>
-          </svg>
-          SVG;
-          file_put_contents('output/coverage.svg', $svg);
-          echo "Coverage: {$value}\n";
-          PHP
-          php /tmp/badge.php
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output/coverage.svg
-          git diff --cached --quiet || git commit -m "Update code coverage badge"
-          git push origin HEAD:main
+      - name: Generate coverage badge
+        uses: timkrase/phpunit-coverage-badge@v1.2.0
+        with:
+          coverage_badge_path: output/coverage.svg
+          push_badge: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
