@@ -27,7 +27,7 @@ jobs:
         run: |
           sudo add-apt-repository ppa:ondrej/php -y
           sudo apt-get update -q
-          sudo apt-get install -y php8.5-cli php8.5-xml php8.5-xdebug
+          sudo apt-get install -y php8.5-cli php8.5-xml php8.5-mbstring php8.5-xdebug
           sudo update-alternatives --set php /usr/bin/php8.5
 
       - name: Install dependencies
@@ -48,8 +48,9 @@ jobs:
             --coverage-filter=src \
             --bootstrap=vendor/autoload.php
 
-      - name: Generate coverage badge
-        uses: timkrase/phpunit-coverage-badge@v1.2.0
+      - name: Generate and push coverage badge
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: timkrase/phpunit-coverage-badge@v1
         with:
           coverage_badge_path: output/coverage.svg
           push_badge: true
