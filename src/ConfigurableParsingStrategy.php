@@ -11,15 +11,17 @@ final class ConfigurableParsingStrategy implements ParsingStrategyInterface
     private readonly string $itemElement;
     /** @var FieldConfig[] */
     private readonly array $fieldConfigs;
+    private readonly ?\Closure $onItem;
     private array $collectedItems = [];
     private array $currentItem = [];
     private bool $insideItem = false;
 
-    public function __construct(array $config)
+    public function __construct(array $config, ?callable $onItem = null)
     {
         $this->validateConfig($config);
         $this->itemElement = $config['item_element'];
         $this->fieldConfigs = $this->buildFieldConfigs($config['fields']);
+        $this->onItem = $onItem !== null ? \Closure::fromCallable($onItem) : null;
     }
 
     public function shouldStartCollecting(string $path, array $attributes): bool
@@ -32,12 +34,8 @@ final class ConfigurableParsingStrategy implements ParsingStrategyInterface
         return $this->shouldStartCollecting($path, []);
     }
 
-    public function processElement(
-        string $path,
-        string $value,
-        array $attributes,
-        ParsingContextStacks $context
-    ): void {
+    public function processElement(string $path, string $value, array $attributes): void
+    {
         if ($this->shouldStartCollecting($path, $attributes)) {
             $this->startNewItem($attributes);
 
@@ -51,14 +49,13 @@ final class ConfigurableParsingStrategy implements ParsingStrategyInterface
         $this->processAttributeFields($path, $attributes);
     }
 
-    public function processCharacterData(string $data, ParsingContextStacks $context): void
+    public function processCharacterData(string $data, string $currentPath): void
     {
         $trimmedData = trim($data);
         if (!$this->insideItem || empty($trimmedData)) {
             return;
         }
 
-        $currentPath = $context->getCurrentPath();
         $matchingField = $this->findMatchingField($currentPath);
 
         if ($matchingField) {
@@ -81,7 +78,11 @@ final class ConfigurableParsingStrategy implements ParsingStrategyInterface
     public function finishCurrentItem(): void
     {
         if ($this->insideItem && !empty($this->currentItem)) {
-            $this->collectedItems[] = $this->currentItem;
+            if ($this->onItem !== null) {
+                ($this->onItem)($this->currentItem);
+            } else {
+                $this->collectedItems[] = $this->currentItem;
+            }
             $this->currentItem = [];
         }
         $this->insideItem = false;
@@ -140,10 +141,13 @@ final class ConfigurableParsingStrategy implements ParsingStrategyInterface
     private function processFieldValue(FieldConfig $fieldConfig, string $path, string $value): void
     {
         $this->currentItem[$fieldConfig->name] = match ($fieldConfig->type) {
-            FieldType::ARRAY => $this->processArrayField($fieldConfig->name, $value),
-            FieldType::OBJECT => $this->processObjectField($fieldConfig->name, $path, $value),
+            FieldType::ARRAY     => $this->processArrayField($fieldConfig->name, $value),
+            FieldType::OBJECT    => $this->processObjectField($fieldConfig->name, $path, $value),
             FieldType::ATTRIBUTE => $this->processAttributeField($fieldConfig->name, $value),
-            default => $value,
+            FieldType::INTEGER   => (int) $value,
+            FieldType::FLOAT     => (float) $value,
+            FieldType::BOOLEAN   => (bool) filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            default              => $value,
         };
     }
 

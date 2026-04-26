@@ -8,3 +8,6 @@
 .vscode/
 .DS_Store
 /.php-cs-fixer.cache
+.claude/
+CLAUDE.md
+.notes/

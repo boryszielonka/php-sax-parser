@@ -2,10 +2,9 @@
 [![CI](https://github.com/boryszielonka/php-sax-parser/actions/workflows/ci.yml/badge.svg)](https://github.com/boryszielonka/php-sax-parser/actions)
 [![Coverage](https://raw.githubusercontent.com/boryszielonka/php-sax-parser/main/output/coverage.svg)](https://github.com/boryszielonka/php-sax-parser)
 
-Simple and efficient XML streaming parser for PHP using SAX (Simple API for XML) approach. 
-This library allows you to parse large XML files without loading entire document into memory.
-This parser reads XML files chunk by chunk (streaming) so you can process huge XML files without memory issues.
-You configure what data you want to extract using simple YAML configs or direct PHP arrays.
+Simple and efficient XML streaming parser for PHP using SAX (Simple API for XML).
+Reads XML files chunk by chunk (4 KB at a time), so large files never load into memory during parsing.
+You configure what data to extract using YAML or PHP array config.
 
 ## Installation
 
@@ -16,136 +15,193 @@ composer require boryszielonka/php-sax-parser
 ## Requirements
 
 - PHP 8.4 or higher
-- ext-xml extension
-- ext-libxml extension
+- ext-xml
+- ext-libxml
+
+## Quick start
+
+```php
+use BoZielonka\PhpSaxParser\Config;
+use BoZielonka\PhpSaxParser\ConfigParser;
+use BoZielonka\PhpSaxParser\SaxParser;
+
+$parser = new SaxParser(
+    new Config(
+        (new ConfigParser())->parseYamlFile('configs/parsers.yaml')
+    )
+);
+
+// Returns all items as an array (convenient for small-to-medium files)
+$products = $parser->parse('products.xml', 'products');
+
+// Streams items one-by-one via callback (recommended for large files)
+$parser->parseEach('products.xml', 'products', function (array $product): void {
+    // process or write to DB immediately — only one item in memory at a time
+    echo $product['name'] . PHP_EOL;
+});
+```
 
 ## Usage
 
-### With YAML Configuration File
+### YAML configuration
 
-Create config file `configs/products.yaml`:
+Create `configs/parsers.yaml`:
 
 ```yaml
-products:
-  item_element: product
-  fields:
-    id: "@id"
-    name: "name" 
-    price: "price"
-    description: "description"
-    categories:
-      type: array
-      path: "category"
-      fields:
-        name: "name"
-        code: "@code"
-    attributes:
-      type: object
-      fields:
-        weight: "weight"
-        color: "@color"
+parsers:
+  products:
+    root_element: "products"
+    item_element: "product"
+    fields:
+      id: "@id"
+      name: "name"
+      category: "category"
+      price:
+        type: "attribute"
+        path: "price"
+        attribute: "currency"
+      tags:
+        type: "array"
+        path: "tag"
+      meta:
+        type: "object"
 ```
 
 Then:
 
 ```php
-$parser = new SaxParser();
-$parser->loadConfigFromFile('configs/products.yaml');
-$result = $parser->parse('products.xml', 'products');
+$parser = new SaxParser(
+    new Config(
+        (new ConfigParser())->parseYamlFile('configs/parsers.yaml')
+    )
+);
+
+$items = $parser->parse('products.xml', 'products');
 ```
 
-## Configuration Options
+### PHP array configuration
 
-### Field Types
+```php
+$config = [
+    'item_element' => 'product',
+    'fields' => [
+        'id'       => '@id',
+        'name'     => 'name',
+        'quantity' => ['type' => 'integer', 'path' => 'quantity'],
+        'price'    => ['type' => 'float',   'path' => 'price'],
+        'active'   => ['type' => 'boolean', 'path' => 'active'],
+        'tags'     => ['type' => 'array',   'path' => 'tag'],
+    ]
+];
 
-- `string` (default) - extracts text content
-- `attribute` - extracts attribute value using `@attribute_name`
-- `array` - collects multiple elements into array
-- `object` - creates nested object structure
+$items = $parser->parseWithConfig('products.xml', $config);
+```
 
-### Field Configuration Examples
+### Callback API (large files)
+
+Use `parseEach` / `parseEachWithConfig` when the full result set would not fit in memory.
+The callback receives each item immediately as it is completed — `$collectedItems` never grows.
+
+```php
+// Named parser from YAML config
+$parser->parseEach('large.xml', 'products', function (array $item): void {
+    $db->insert($item);
+});
+
+// Inline PHP array config
+$parser->parseEachWithConfig('large.xml', $config, function (array $item): void {
+    $db->insert($item);
+});
+```
+
+## Field types
+
+| Type        | Description                                       | PHP return type  |
+|-------------|---------------------------------------------------|------------------|
+| `string`    | Text content of an element (default)              | `string`         |
+| `integer`   | Text content cast to int                          | `int`            |
+| `float`     | Text content cast to float                        | `float`          |
+| `boolean`   | Text content cast to bool (`true`/`false`/`1`/`0`/`yes`/`no`) | `bool` |
+| `attribute` | Attribute value from an element                   | `array`          |
+| `array`     | Collects repeated elements into an array          | `array`          |
+| `object`    | Collects child element values as a keyed array    | `array`          |
+
+### Field definition syntax
 
 ```yaml
-# Simple text content
-name: "product_name"
+# Simple path (string shorthand)
+name: "element_name"
 
-# Attribute value  
-id: "@product_id"
+# Root-element attribute
+id: "@attribute_name"
 
-# Nested object
-category:
-  type: object
-  fields:
-    name: "name"
-    id: "@cat_id"
+# Typed field
+quantity:
+  type: integer
+  path: element_name
 
-# Array of elements
+# Attribute on a child element
+price:
+  type: attribute
+  path: price          # path to the element
+  attribute: currency  # attribute name to extract
+
+# Array of repeated elements
 tags:
   type: array
-  path: "tag"
-  
-# Complex array with objects
-variants:
-  type: array
-  path: "variant"
-  fields:
-    size: "@size"
-    price: "price"
-    stock: "stock_count"
+  path: tag
+
+# Object (keyed by child element name)
+dimensions:
+  type: object
+  path: dimensions
 ```
 
-## Example XML Structure
+## API reference
 
-```xml
-<?xml version="1.0"?>
-<products>
-  <product id="123">
-    <name>Cool T-Shirt</name>
-    <price currency="USD">29.99</price>
-    <category code="CLOTH">
-      <name>Clothing</name>
-    </category>
-    <variant size="M">
-      <price>29.99</price>
-      <stock_count>10</stock_count>
-    </variant>
-    <variant size="L">
-      <price>31.99</price>
-      <stock_count>5</stock_count>
-    </variant>
-  </product>
-</products>
+```php
+// Parse using a named parser from the loaded YAML config — returns array
+$parser->parse(string $filePath, string $parserName = 'default'): array
+
+// Parse with an inline PHP array config — returns array
+$parser->parseWithConfig(string $filePath, array $config): array
+
+// Stream items via callback using a named parser
+$parser->parseEach(string $filePath, string $parserName, callable $callback): void
+
+// Stream items via callback with an inline PHP array config
+$parser->parseEachWithConfig(string $filePath, array $config, callable $callback): void
 ```
 
 ## Development
 
-### Testing
-
 ```bash
+# Run tests
 vendor/bin/phpunit tests
-```
 
-### Code Quality
+# Tests with coverage
+./vendor/bin/phpunit tests --coverage-clover=clover.xml --coverage-filter=src --bootstrap=vendor/autoload.php
 
-```bash
-vendor/bin/php-cs-fixer fix /src
+# Static analysis
 vendor/bin/phpstan analyse src/ --level=5
+
+# Code style (fix)
+vendor/bin/php-cs-fixer fix src/
+
+# Code style (check only)
+./vendor/bin/phpcs --standard=PSR12 src/
 ```
 
 ## TODO
 
-- [ ] **Streaming output**: Option to write results directly to file/database instead of memory
-- [ ] Allow setting custom fread() buffer size instead of hardcoded 4KB
+- [ ] Allow setting custom fread() buffer size instead of hardcoded 4 KB
+- [ ] Nested field definitions for `object` type (explicit child field mapping in config)
 - [ ] Add benchmark tests comparing against other XML parsers
-- [ ] Add command to analyze XML structure and generate YAML config automatically
-- [ ] Built-in data validation during parsing (required fields, data types, etc.)
-- [ ] Allow custom processing functions for specific elements
-- [ ] Callback interface for tracking parsing progress on large files
-- and more...
+- [ ] Add command to analyze XML structure and auto-generate YAML config
 
 ## Contributing
 
-Feel free to submit issues and pull requests. 
+Feel free to submit issues and pull requests.
 I'd appreciate feedback!
 
 ```

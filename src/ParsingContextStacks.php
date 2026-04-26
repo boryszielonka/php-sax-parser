@@ -43,7 +43,6 @@ final class ParsingContextStacks
 
         $elementInfo = $this->elementStack->pop();
 
-        // Restor prev data state
         $this->currentData = $this->dataStack->pop();
 
         // Update current path
@@ -64,12 +63,9 @@ final class ParsingContextStacks
         $this->currentData = [];
     }
 
-    public function stopCollecting(): array
+    public function stopCollecting(): void
     {
-        $data = $this->currentData;
         $this->currentData = [];
-
-        return $data;
     }
 
     private function buildPath(string $element): string

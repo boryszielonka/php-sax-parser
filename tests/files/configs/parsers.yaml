@@ -11,8 +11,6 @@ parsers:
         type: "attribute"
         path: "price"
         attribute: "currency"
-        transform:
-          format: "%.2f"
       description: "description"
   
   plants:

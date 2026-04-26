@@ -10,11 +10,11 @@ interface ParsingStrategyInterface
 
     public function shouldStopCollecting(string $path): bool;
 
-    public function processElement(string $path, string $value, array $attributes, ParsingContextStacks $context): void;
+    public function processElement(string $path, string $value, array $attributes): void;
 
-    public function processCharacterData(string $data, ParsingContextStacks $context): void;
+    public function processCharacterData(string $data, string $currentPath): void;
+
+    public function finishCurrentItem(): void;
 
     public function getCollectedData(): array;
-
-    public function reset(): void;
 }

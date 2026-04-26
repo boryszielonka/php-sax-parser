@@ -20,38 +20,46 @@ final readonly class SaxParser implements SaxParserInterface
             throw new InvalidArgumentException("Parser config '{$parserName}' not found");
         }
 
-        //        return $this->parseWithConfig($filePath, $this->parsersConfig['parsers'][$parserName]);
         return $this->parseWithConfig($filePath, $this->config->parsersConfig['parsers'][$parserName]);
     }
 
-    /**
-     * @TODO #1 consider private
-     */
     public function parseWithConfig(string $filePath, array $config): array
+    {
+        $items = [];
+        $this->parseEachWithConfig($filePath, $config, static function (array $item) use (&$items): void {
+            $items[] = $item;
+        });
+
+        return $items;
+    }
+
+    public function parseEach(string $filePath, string $parserName, callable $callback): void
+    {
+        if (!isset($this->config->parsersConfig['parsers'][$parserName])) {
+            throw new InvalidArgumentException("Parser config '{$parserName}' not found");
+        }
+
+        $this->parseEachWithConfig($filePath, $this->config->parsersConfig['parsers'][$parserName], $callback);
+    }
+
+    public function parseEachWithConfig(string $filePath, array $config, callable $callback): void
     {
         if (!file_exists($filePath)) {
             throw new InvalidArgumentException("XML file not found: {$filePath}");
         }
 
         $context = new ParsingContextStacks();
-        $strategy = new ConfigurableParsingStrategy($config);
+        $strategy = new ConfigurableParsingStrategy($config, $callback);
 
         $xmlParser = xml_parser_create();
         $this->setupXmlHandlers($xmlParser, $context, $strategy);
-
-        try {
-            $this->parseFile($xmlParser, $filePath);
-
-            return $strategy->getCollectedData();
-        } finally {
-            xml_parser_free($xmlParser);
-        }
+        $this->parseFile($xmlParser, $filePath);
     }
 
     private function setupXmlHandlers(
         \XMLParser $xmlParser,
         ParsingContextStacks $context,
-        ConfigurableParsingStrategy $strategy
+        ParsingStrategyInterface $strategy
     ): void {
         $startHandler = static function (
             \XMLParser $parser,
@@ -68,7 +76,7 @@ final readonly class SaxParser implements SaxParserInterface
                 $context->startCollecting();
             }
 
-            $strategy->processElement($currentPath, '', $attributes, $context);
+            $strategy->processElement($currentPath, '', $attributes);
         };
 
         $endHandler = static function (\XMLParser $parser, string $name) use ($context, $strategy): void {
@@ -89,13 +97,12 @@ final readonly class SaxParser implements SaxParserInterface
             $context,
             $strategy
         ): void {
-            $strategy->processCharacterData($data, $context);
+            $strategy->processCharacterData($data, $context->getCurrentPath());
         };
 
         xml_set_element_handler($xmlParser, $startHandler, $endHandler);
         xml_set_character_data_handler($xmlParser, $characterDataHandler);
 
-        // Set parser options for better error handling
         xml_parser_set_option($xmlParser, XML_OPTION_CASE_FOLDING, 0);
         xml_parser_set_option($xmlParser, XML_OPTION_SKIP_WHITE, 1);
     }
@@ -112,7 +119,6 @@ final readonly class SaxParser implements SaxParserInterface
                 $isLastChunk = feof($handle);
                 if (!xml_parse($xmlParser, $data, $isLastChunk)) {
                     $errorCode = xml_get_error_code($xmlParser);
-                    // Only throw error if it's a real error (not XML_ERROR_NONE)
                     if ($errorCode !== XML_ERROR_NONE) {
                         $error = xml_error_string($errorCode);
                         $line = xml_get_current_line_number($xmlParser);

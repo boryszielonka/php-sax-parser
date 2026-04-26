@@ -13,7 +13,6 @@ final class ConfigurableParsingStrategyTest extends TestCase
 {
     public function testSimpleStringFieldParsing(): void
     {
-        // Arrange
         $config = [
             'item_element' => 'product',
             'fields' => [
@@ -25,16 +24,13 @@ final class ConfigurableParsingStrategyTest extends TestCase
         $strategy = new ConfigurableParsingStrategy($config);
         $context = new ParsingContextStacks();
 
-        // Act
         $context->pushElement('product', []);
-        $strategy->processElement('product', '', [], $context);
+        $strategy->processElement('product', '', []);
         $context->pushElement('name', []);
-        $strategy->processElement('product/name', '', [], $context);
-        $strategy->processCharacterData('Test Product', $context);
+        $strategy->processCharacterData('Test Product', $context->getCurrentPath());
         $context->popElement();
         $strategy->finishCurrentItem();
 
-        // Assert
         $result = $strategy->getCollectedData();
 
         $this->assertCount(1, $result);
@@ -51,7 +47,6 @@ final class ConfigurableParsingStrategyTest extends TestCase
 
     public function testAttributeFieldParsing(): void
     {
-        // Arrange
         $config = [
             'item_element' => 'product',
             'fields' => [
@@ -63,21 +58,83 @@ final class ConfigurableParsingStrategyTest extends TestCase
         $strategy = new ConfigurableParsingStrategy($config);
         $context = new ParsingContextStacks();
 
-        // Act
         $context->pushElement('product', ['id' => '123']);
-        $strategy->processElement('product', '', ['id' => '123'], $context);
+        $strategy->processElement('product', '', ['id' => '123']);
 
         $context->pushElement('name', []);
-        $strategy->processCharacterData('Test', $context);
+        $strategy->processCharacterData('Test', $context->getCurrentPath());
         $context->popElement();
 
         $strategy->finishCurrentItem();
 
-        // Assert
         $result = $strategy->getCollectedData();
 
         $this->assertCount(1, $result);
         $this->assertEquals('123', $result[0]['id']);
         $this->assertEquals('Test', $result[0]['name']);
+    }
+
+    public function testResetClearsState(): void
+    {
+        $config = ['item_element' => 'product', 'fields' => ['name' => 'name']];
+        $strategy = new ConfigurableParsingStrategy($config);
+        $context = new ParsingContextStacks();
+
+        $context->pushElement('product', []);
+        $strategy->processElement('product', '', []);
+        $context->pushElement('name', []);
+        $strategy->processCharacterData('Test', $context->getCurrentPath());
+        $context->popElement();
+        $strategy->finishCurrentItem();
+
+        $this->assertCount(1, $strategy->getCollectedData());
+
+        $strategy->reset();
+
+        $this->assertCount(0, $strategy->getCollectedData());
+    }
+
+    public function testSourceAliasForPath(): void
+    {
+        $config = [
+            'item_element' => 'product',
+            'fields' => [
+                'name' => ['type' => 'string', 'source' => 'name'],
+            ]
+        ];
+        $strategy = new ConfigurableParsingStrategy($config);
+        $context = new ParsingContextStacks();
+
+        $context->pushElement('product', []);
+        $strategy->processElement('product', '', []);
+        $context->pushElement('name', []);
+        $strategy->processCharacterData('SourceAlias', $context->getCurrentPath());
+        $context->popElement();
+        $strategy->finishCurrentItem();
+
+        $this->assertEquals('SourceAlias', $strategy->getCollectedData()[0]['name']);
+    }
+
+    public function testAttributeFieldOnChildElement(): void
+    {
+        $config = [
+            'item_element' => 'product',
+            'fields' => [
+                'currency' => ['type' => 'attribute', 'path' => 'price', 'attribute' => 'currency'],
+            ]
+        ];
+        $strategy = new ConfigurableParsingStrategy($config);
+        $context = new ParsingContextStacks();
+
+        $context->pushElement('product', []);
+        $strategy->processElement('product', '', []);
+        $context->pushElement('price', ['currency' => 'USD']);
+        $strategy->processElement('product/price', '', ['currency' => 'USD']);
+        $strategy->finishCurrentItem();
+
+        $result = $strategy->getCollectedData();
+
+        $this->assertCount(1, $result);
+        $this->assertEquals('USD', $result[0]['currency']['currency']);
     }
 }

@@ -3,7 +3,7 @@
     "description": "This package makes it simple to use SAX parser for efficient XML parsing.",
     "type": "library",
     "require": {
-        "php": "8.4.*",
+        "php": "8.5.*",
         "ext-xml": "*",
         "monolog/monolog": "^3.9",
         "ext-libxml": "*",
