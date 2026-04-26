@@ -48,7 +48,7 @@ jobs:
             --coverage-filter=src \
             --bootstrap=vendor/autoload.php
 
-      - name: Generate and push coverage badge
+      - name: Generate and push coverage badge 2
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: timkrase/phpunit-coverage-badge@v1
         with:
